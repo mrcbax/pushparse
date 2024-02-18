@@ -73,6 +73,9 @@ pub async fn main() {
     let final_set: Arc<Mutex<HashSet<String>>> = Arc::new(Mutex::new(HashSet::new()));
     let tasks: Vec<JoinHandle<()>> = vec!();
     for entry in walk {
+        while tasks.len() > 5 {
+            std::thread::sleep(std::time::Duration::from_secs(10));
+        }
         let progress = pb1.clone();
         let set = final_set.clone();
         tokio::spawn(async move {
