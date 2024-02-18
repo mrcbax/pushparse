@@ -95,10 +95,10 @@ pub async fn main() {
         while task_count >= TASK_COUNT {
             task_count = 0;
             for task_num in 0..tasks.len() {
-                if !tasks.get(task_num).unwrap().is_finished() {
-                    task_count += 1;
-                } else {
+                if tasks.get(task_num).unwrap().is_finished() {
                     let _ = tokio::join!(tasks.get_mut(task_num).unwrap());
+                } else {
+                    task_count += 1;
                 }
             }
             std::thread::sleep(std::time::Duration::from_secs(10));
