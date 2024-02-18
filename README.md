@@ -2,10 +2,10 @@
 
 ## An example streaming data extractor for the compressed Pushshift Reddit database.
 
-12TB of data was obtained from [the Pushshift Archive](https://the-eye.eu/redarcs/).
+2TB of data was obtained from [the Pushshift Archive](https://the-eye.eu/redarcs/).
 (Remember to be a good netizen and use the Torrent option to avoid overloading the archive's servers)
 
-With a moderately sized setup, this code can process the entire 12TB dataset in under 12 hours.
+With a moderately sized setup, this code can process the entire 2TB dataset in under 12 hours.
 
 The machine used for this test:
 
