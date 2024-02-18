@@ -30,7 +30,7 @@ pub async fn extract_parse(input_filename: &Path) -> HashSet<CompactString> {
                     usernames.insert(author.into());
                 }
             }
-            Err(_) => (),
+            Err(e) => eprintln!("{:?}", e),
         }
         line.clear();
     }
