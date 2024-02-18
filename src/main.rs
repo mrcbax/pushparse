@@ -12,9 +12,10 @@ use tokio::sync::Mutex;
 use tokio::task::JoinHandle;
 use walkdir::WalkDir;
 use zstd::stream::Decoder;
+use compact_str::CompactString;
 
-pub async fn extract_parse(input_filename: &Path) -> HashSet<String> {
-    let mut usernames: HashSet<String> = HashSet::new();
+pub async fn extract_parse(input_filename: &Path) -> HashSet<CompactString> {
+    let mut usernames: HashSet<CompactString> = HashSet::new();
     let file = File::open(input_filename).unwrap();
     let mut reader = Decoder::with_buffer(BufReader::new(file)).unwrap();
     let _ = reader.window_log_max(31);
@@ -25,7 +26,9 @@ pub async fn extract_parse(input_filename: &Path) -> HashSet<String> {
         match simd_json::to_borrowed_value(&mut line_bytes.clone()) {
             Ok(o) => {
                 let author = o.get_str("author").unwrap();
-                usernames.insert(author.into());
+                if author.len() <= 20 {
+                    usernames.insert(author.into());
+                }
             }
             Err(_) => (),
         }
@@ -70,7 +73,7 @@ pub async fn main() {
 
     println!("Processing files:");
     let pb1: Arc<Mutex<ProgressBar>> = Arc::new(Mutex::new(ProgressBar::new(walk.len() as u64)));
-    let final_set: Arc<Mutex<HashSet<String>>> = Arc::new(Mutex::new(HashSet::new()));
+    let final_set: Arc<Mutex<HashSet<CompactString>>> = Arc::new(Mutex::new(HashSet::new()));
     let tasks: Vec<JoinHandle<()>> = vec!();
     for entry in walk {
         while tasks.len() >= 6 {  // Set this to the number of tokio workers you set above.
