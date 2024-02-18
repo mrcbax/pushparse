@@ -16,8 +16,20 @@ use zstd::stream::Decoder;
 
 pub async fn extract_parse(input_filename: &Path) -> HashSet<CompactString> {
     let mut usernames: HashSet<CompactString> = HashSet::new();
-    let file = File::open(input_filename).unwrap();
-    let mut reader = Decoder::with_buffer(BufReader::new(file)).unwrap();
+    let file = match File::open(input_filename){
+        Ok(o) => o,
+        Err(e) => {
+            eprintln!("{:?}", e);
+            return HashSet::new();
+        }
+    };
+    let mut reader = match Decoder::with_buffer(BufReader::new(file)){
+        Ok(o) => o,
+        Err(e) => {
+            eprintln!("{:?}", e);
+            return HashSet::new();
+        }
+    };
     let _ = reader.window_log_max(31);
     let mut reader = BufReader::new(reader);
     let mut line: String = "".into();
@@ -25,7 +37,7 @@ pub async fn extract_parse(input_filename: &Path) -> HashSet<CompactString> {
         let line_bytes = line.bytes().collect::<Vec<u8>>();
         match simd_json::to_borrowed_value(&mut line_bytes.clone()) {
             Ok(o) => {
-                let author = o.get_str("author").unwrap();
+                let author = o.get_str("author").unwrap_or_default();
                 if author.len() <= 20 {
                     usernames.insert(author.into());
                 }
