@@ -58,7 +58,8 @@ pub async fn extract_parse(input_filename: &Path) -> HashSet<CompactString> {
 * I found that on the largest files, each thread will consume about 12GB of RAM. Making 16GB the
 * bare mininum amount of RAM to run this tool.
 */
-#[tokio::main(flavor = "multi_thread", worker_threads = 8)] // SEE ABOVE COMMENT ^^^^^
+const THREAD_COUNT: usize = 8; // set this
+#[tokio::main(flavor = "multi_thread", worker_threads = 8)] // set this too SEE ABOVE COMMENT ^^^^^
 pub async fn main() {
     let directory_path = std::env::args()
         .nth(1)
@@ -91,21 +92,23 @@ pub async fn main() {
     let mut tasks: Vec<JoinHandle<()>> = vec![];
     for entry in walk {
         let mut task_count: usize = 0;
-        for task_num in 0..tasks.len() {
-            if !tasks.get(task_num).unwrap().is_finished() {
-                task_count += 1;
+        while task_count >= THREAD_COUNT {
+            task_count = 0;
+            for task_num in 0..tasks.len() {
+                if !tasks.get(task_num).unwrap().is_finished() {
+                    task_count += 1;
+                }
             }
+            std::thread::sleep(std::time::Duration::from_secs(10));
         }
         // Set this to the number of tokio workers you set above.
-        if task_count < 8 {
-            let progress = pb1.clone();
-            let set = final_set.clone();
-            tasks.push(tokio::spawn(async move {
-                let current_set = extract_parse(entry.path()).await;
-                set.lock().await.extend(current_set);
-                progress.lock().await.inc(1);
-            }));
-        }
+        let progress = pb1.clone();
+        let set = final_set.clone();
+        tasks.push(tokio::spawn(async move {
+            let current_set = extract_parse(entry.path()).await;
+            set.lock().await.extend(current_set);
+            progress.lock().await.inc(1);
+        }));
     }
 
     for task in tasks {
