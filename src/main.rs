@@ -59,7 +59,7 @@ pub async fn extract_parse(input_filename: &Path) -> HashSet<CompactString> {
 * bare mininum amount of RAM to run this tool.
 */
 const THREAD_COUNT: usize = 8; // set this
-#[tokio::main(flavor = "multi_thread", worker_threads = 8)] // set this too SEE ABOVE COMMENT ^^^^^
+#[tokio::main(flavor = "multi_thread")]
 pub async fn main() {
     let directory_path = std::env::args()
         .nth(1)
