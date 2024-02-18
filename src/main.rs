@@ -34,7 +34,14 @@ pub async fn extract_parse(input_filename: &Path) -> HashSet<String> {
     return usernames;
 }
 
-#[tokio::main(flavor = "multi_thread")]
+/*
+* 6 worker threads is about all I can handle with 96GB of RAM.
+* Unfortunately, the only way to figure out if you are going to run out of RAM is by running the
+* process to the end.
+* I found that on the largest files, each thread will consume about 12GB of RAM. Making 16GB the
+* bare mininum amount of RAM to run this tool.
+*/
+#[tokio::main(flavor = "multi_thread", worker_threads = 6)] // SEE ABOVE COMMENT ^^^^^
 pub async fn main() {
     let directory_path = std::env::args()
         .nth(1)
