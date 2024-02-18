@@ -101,11 +101,7 @@ pub async fn main() {
             set.lock().await.extend(current_set);
             progress.lock().await.inc(1);
         }));
-        for task_num in 0..tasks.len() {
-            if tasks.get(task_num).unwrap().is_finished() {
-                tasks.remove(task_num);
-            }
-        }
+        tasks.retain(|t| !&t.is_finished());
     }
 
     for task in tasks {
