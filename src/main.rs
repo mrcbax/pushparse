@@ -90,18 +90,22 @@ pub async fn main() {
     let final_set: Arc<Mutex<HashSet<CompactString>>> = Arc::new(Mutex::new(HashSet::new()));
     let mut tasks: Vec<JoinHandle<()>> = vec![];
     for entry in walk {
-        while tasks.len() >= 7 {
-            // Set this to the number of tokio workers - 1 you set above.
-            std::thread::sleep(std::time::Duration::from_secs(10));
+        let mut task_count: usize = 0;
+        for task_num in 0..tasks.len() {
+            if !tasks.get(task_num).unwrap().is_finished() {
+                task_count += 1;
+            }
         }
-        let progress = pb1.clone();
-        let set = final_set.clone();
-        tasks.push(tokio::spawn(async move {
-            let current_set = extract_parse(entry.path()).await;
-            set.lock().await.extend(current_set);
-            progress.lock().await.inc(1);
-        }));
-        tasks.retain(|t| !&t.is_finished());
+        // Set this to the number of tokio workers you set above.
+        if task_count < 8 {
+            let progress = pb1.clone();
+            let set = final_set.clone();
+            tasks.push(tokio::spawn(async move {
+                let current_set = extract_parse(entry.path()).await;
+                set.lock().await.extend(current_set);
+                progress.lock().await.inc(1);
+            }));
+        }
     }
 
     for task in tasks {
