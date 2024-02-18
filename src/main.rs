@@ -76,7 +76,9 @@ pub async fn main() {
     }
 
     for task in tasks {
-        let _ = task.await;
+        while !task.is_finished() {
+            std::thread::sleep(std::time::Duration::from_secs(10));
+        }
     }
 
     let mut file = std::fs::OpenOptions::new()
