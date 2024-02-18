@@ -101,7 +101,6 @@ pub async fn main() {
             }
             std::thread::sleep(std::time::Duration::from_secs(10));
         }
-        // Set this to the number of tokio workers you set above.
         let progress = pb1.clone();
         let set = final_set.clone();
         tasks.push(tokio::spawn(async move {
