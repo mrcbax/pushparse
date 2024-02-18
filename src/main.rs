@@ -88,7 +88,7 @@ pub async fn main() {
     println!("Processing files:");
     let pb1: Arc<Mutex<ProgressBar>> = Arc::new(Mutex::new(ProgressBar::new(walk.len() as u64)));
     let final_set: Arc<Mutex<HashSet<CompactString>>> = Arc::new(Mutex::new(HashSet::new()));
-    let tasks: Vec<JoinHandle<()>> = vec![];
+    let mut tasks: Vec<JoinHandle<()>> = vec![];
     for entry in walk {
         while tasks.len() >= 7 {
             // Set this to the number of tokio workers - 1 you set above.
@@ -96,11 +96,11 @@ pub async fn main() {
         }
         let progress = pb1.clone();
         let set = final_set.clone();
-        tokio::spawn(async move {
+        tasks.push(tokio::spawn(async move {
             let current_set = extract_parse(entry.path()).await;
             set.lock().await.extend(current_set);
             progress.lock().await.inc(1);
-        });
+        }));
     }
 
     for task in tasks {
