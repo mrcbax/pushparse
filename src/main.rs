@@ -9,6 +9,7 @@ use std::sync::Arc;
 use indicatif::ProgressBar;
 use simd_json::derived::ValueObjectAccessAsScalar;
 use tokio::sync::Mutex;
+use tokio::task::JoinHandle;
 use walkdir::WalkDir;
 use zstd::stream::Decoder;
 
@@ -63,6 +64,7 @@ pub async fn main() {
     println!("Processing files:");
     let pb1: Arc<Mutex<ProgressBar>> = Arc::new(Mutex::new(ProgressBar::new(walk.len() as u64)));
     let final_set: Arc<Mutex<HashSet<String>>> = Arc::new(Mutex::new(HashSet::new()));
+    let tasks: Vec<JoinHandle<()>> = vec!();
     for entry in walk {
         let progress = pb1.clone();
         let set = final_set.clone();
@@ -71,6 +73,10 @@ pub async fn main() {
             set.lock().await.extend(current_set);
             progress.lock().await.inc(1);
         });
+    }
+
+    for task in tasks {
+        let _ = task.await;
     }
 
     let mut file = std::fs::OpenOptions::new()
