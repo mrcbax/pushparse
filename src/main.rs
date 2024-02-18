@@ -58,7 +58,7 @@ pub async fn extract_parse(input_filename: &Path) -> HashSet<CompactString> {
 * I found that on the largest files, each thread will consume about 12GB of RAM. Making 16GB the
 * bare mininum amount of RAM to run this tool.
 */
-const THREAD_COUNT: usize = 8; // set this
+const TASK_COUNT: usize = 8; // set this
 #[tokio::main(flavor = "multi_thread")]
 pub async fn main() {
     let directory_path = std::env::args()
@@ -92,11 +92,13 @@ pub async fn main() {
     let mut tasks: Vec<JoinHandle<()>> = vec![];
     for entry in walk {
         let mut task_count: usize = 0;
-        while task_count >= THREAD_COUNT {
+        while task_count >= TASK_COUNT {
             task_count = 0;
             for task_num in 0..tasks.len() {
                 if !tasks.get(task_num).unwrap().is_finished() {
                     task_count += 1;
+                } else {
+                    let _ = tokio::join!(tasks.get_mut(task_num).unwrap());
                 }
             }
             std::thread::sleep(std::time::Duration::from_secs(10));
@@ -111,9 +113,7 @@ pub async fn main() {
     }
 
     for task in tasks {
-        while !task.is_finished() {
-            std::thread::sleep(std::time::Duration::from_secs(10));
-        }
+        let _ = tokio::join!(task);
     }
 
     let mut file = std::fs::OpenOptions::new()
