@@ -1,6 +1,6 @@
 # Pushparse
 
-## An example data extractor for the compressed PushShift Reddit database.
+## An example streaming data extractor for the compressed PushShift Reddit database.
 
 12TB of data was obtained from [the Pushshift Archive](https://the-eye.eu/redarcs/).
 (Remember to be a good netizen and use the Torrent option to avoid overloading the archive's servers)
