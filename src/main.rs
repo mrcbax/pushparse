@@ -78,7 +78,7 @@ pub async fn main() {
     let final_set: Arc<Mutex<HashSet<CompactString>>> = Arc::new(Mutex::new(HashSet::new()));
     let tasks: Vec<JoinHandle<()>> = vec![];
     for entry in walk {
-        while tasks.len() >= 6 {
+        while tasks.len() >= 8 {
             // Set this to the number of tokio workers you set above.
             std::thread::sleep(std::time::Duration::from_secs(10));
         }
