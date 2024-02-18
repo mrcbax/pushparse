@@ -6,13 +6,13 @@ use std::ops::Deref;
 use std::path::Path;
 use std::sync::Arc;
 
+use compact_str::CompactString;
 use indicatif::ProgressBar;
 use simd_json::derived::ValueObjectAccessAsScalar;
 use tokio::sync::Mutex;
 use tokio::task::JoinHandle;
 use walkdir::WalkDir;
 use zstd::stream::Decoder;
-use compact_str::CompactString;
 
 pub async fn extract_parse(input_filename: &Path) -> HashSet<CompactString> {
     let mut usernames: HashSet<CompactString> = HashSet::new();
@@ -74,9 +74,10 @@ pub async fn main() {
     println!("Processing files:");
     let pb1: Arc<Mutex<ProgressBar>> = Arc::new(Mutex::new(ProgressBar::new(walk.len() as u64)));
     let final_set: Arc<Mutex<HashSet<CompactString>>> = Arc::new(Mutex::new(HashSet::new()));
-    let tasks: Vec<JoinHandle<()>> = vec!();
+    let tasks: Vec<JoinHandle<()>> = vec![];
     for entry in walk {
-        while tasks.len() >= 6 {  // Set this to the number of tokio workers you set above.
+        while tasks.len() >= 6 {
+            // Set this to the number of tokio workers you set above.
             std::thread::sleep(std::time::Duration::from_secs(10));
         }
         let progress = pb1.clone();
