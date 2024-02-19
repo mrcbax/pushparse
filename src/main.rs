@@ -51,7 +51,7 @@ pub async fn extract_parse(input_filename: &Path, use_json: bool) -> FxHashSet<C
             line.clear();
         }
     } else {
-        // This is the manual parsing for an author. It is a little over two times faster than fully parsing the JSON.
+        // This is the manual parsing for an author. It is about three times faster than fully parsing the JSON.
         for line in reader.split(b'\n') {
             let line = line.unwrap();
 
