@@ -18,3 +18,5 @@ The machine used for this test:
 You could achieve a faster time by using a system with more resources. Contrary to what you may think, the main limit is the RAM. Even though we are stream decompressing, each worker thread can take up to 15GB of RAM on the larger files. This is an issue with the underlying decompression library. Attempts have been made to reduce the memory footprint everywhere else in the application by using `CompactString`s.
 
 For the system above, 8 tokio worker threads are used.
+
+Some performace improvements are thanks to [mat](https://github.com/mat-1)
