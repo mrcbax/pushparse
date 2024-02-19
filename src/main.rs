@@ -16,7 +16,7 @@ use tokio::task::JoinHandle;
 use walkdir::WalkDir;
 use zstd::stream::Decoder;
 
-pub async fn extract_parse(input_filename: &Path, use_json: bool) -> FxHashSet<CompactString> {
+pub async fn extract_parse(input_filename: &Path, use_json: bool, progress: Arc<Mutex<ProgressBar>>) -> FxHashSet<CompactString> {
     let mut usernames: FxHashSet<CompactString> = FxHashSet::default();
     let file = match File::open(input_filename) {
         Ok(o) => o,
@@ -48,6 +48,7 @@ pub async fn extract_parse(input_filename: &Path, use_json: bool) -> FxHashSet<C
                 }
                 Err(e) => eprintln!("{:?}", e),
             }
+            progress.lock().await.inc((line.len() + 1) as u64);
             line.clear();
         }
     } else {
@@ -65,6 +66,7 @@ pub async fn extract_parse(input_filename: &Path, use_json: bool) -> FxHashSet<C
                     break;
                 }
             }
+            progress.lock().await.inc((line.len() + 1) as u64);
         }
     }
     return usernames;
@@ -136,15 +138,13 @@ pub async fn main() {
                     task_count += 1;
                 }
             }
-            pb1.lock().await.tick();
             std::thread::sleep(std::time::Duration::from_secs(1));
         }
         let progress = pb1.clone();
         let set = final_set.clone();
         tasks.push(tokio::spawn(async move {
-            let current_set = extract_parse(entry.path(), use_json).await;
+            let current_set = extract_parse(entry.path(), use_json, progress).await;
             set.lock().await.extend(current_set);
-            progress.lock().await.inc(entry.metadata().unwrap().len());
         }));
     }
 
