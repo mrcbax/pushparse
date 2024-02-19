@@ -123,7 +123,8 @@ pub async fn main() {
         Arc::new(Mutex::new(ProgressBar::new(compressed_total_size)));
     pb1.lock().await.set_style(ProgressStyle::with_template("{spinner:.green} [{elapsed_precise}] [{wide_bar:.cyan/blue}] {bytes}/{total_bytes} ({bytes_per_sec}, {eta})")
         .unwrap()
-        .progress_chars("#>-"));
+        .progress_chars("#>-")
+        .tick_chars("🕛🕐🕑🕒🕓🕔🕕🕖🕗🕘🕙🕚"));
     pb1.lock().await.enable_steady_tick(std::time::Duration::from_millis(250));
     let final_set: Arc<Mutex<FxHashSet<CompactString>>> =
         Arc::new(Mutex::new(FxHashSet::default()));
