@@ -2,6 +2,8 @@
 
 ## An example streaming data extractor for the compressed Pushshift Reddit database.
 
+### NOTE: This tool operates directly on the compressed zstd archives and DOES NOT require all of the data to be decompressed on disk.
+
 ~2TB of data was obtained from [the Pushshift Archive](https://the-eye.eu/redarcs/).
 (Remember to be a good netizen and use the Torrent option to avoid overloading the archive's servers)
 
