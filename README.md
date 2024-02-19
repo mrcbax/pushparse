@@ -19,4 +19,4 @@ You could achieve a faster time by using a system with more resources. Contrary 
 
 For the system above, 8 tokio worker threads are used.
 
-Some performace improvements are thanks to [mat](https://github.com/mat-1)
+Some performance improvements are thanks to [mat](https://github.com/mat-1)
