@@ -130,17 +130,13 @@ pub async fn main() {
         Arc::new(Mutex::new(FxHashSet::default()));
     let mut tasks: Vec<JoinHandle<()>> = vec![];
     for entry in walk {
-        let mut task_count: usize = 0;
-        while task_count >= TASK_COUNT {
-            task_count = 0;
-            for task_num in 0..tasks.len() {
+        while tasks.len() >= TASK_COUNT {
+            for task_num in (0..tasks.len()).rev() {
                 if tasks.get(task_num).unwrap().is_finished() {
-                    let _ = tokio::join!(tasks.get_mut(task_num).unwrap());
-                } else {
-                    task_count += 1;
+                    let _ = tokio::join!(tasks.remove(task_num));
                 }
+                std::thread::sleep(std::time::Duration::from_secs(1));
             }
-            std::thread::sleep(std::time::Duration::from_secs(1));
         }
         let progress = pb1.clone();
         let set = final_set.clone();
